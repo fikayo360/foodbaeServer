@@ -15,31 +15,31 @@ interface User {
 class Usermodel{
   
     async findUser(username: string): Promise<User | null> {
-        const query = `SELECT * FROM users WHERE username = '${username}';`;
+        const query = `SELECT * FROM "user" WHERE username = '${username}';`;
         try {
           const result = await pool.query(query);
       
           if (result.rows.length === 0) {
             return null;
           } else {
-            const user = JSON.parse(result.rows[0].toJSON());
+            const user = result.rows[0];
             return user;
           }
         } catch (err) {
           console.log(err);
-          return null;
+          return Promise.reject(err)
         }
       }
       
     
-    async findEmail(email: string): Promise<User>{
-        const query = `SELECT * FROM users WHERE username = '${email}';`;
+    async findEmail(email: string): Promise<User | null>{
+        const query = `SELECT * FROM "user" WHERE username = '${email}';`;
         try{
             const result = await pool.query(query)
             if (result.rows.length === 0) {
-                return  Promise.reject()
+                return null
               } else {
-                const user = JSON.parse(result.rows[0].toJSON());
+                const user = result.rows[0];
                 return user;
               }
         }
@@ -50,11 +50,16 @@ class Usermodel{
     }
 
     async createUser(username:string,email:string, password:string): Promise<User>{
-        const id = uuidv4();
-        const query= `INSERT INTO users (id, email, username,password, profile_pic,resettoken,isAdmmin) 
-        VALUES (${id},${email},${username},${bcrypt.hashSync(password, 10)});`
+      
+      const id = uuidv4();
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const query = `
+        INSERT INTO "user" (id, email, username, password) 
+        VALUES ($1, $2, $3, $4);
+      `;
+      const values = [id, email, username, hashedPassword];
         try{
-            const result = await pool.query(query);
+          const result = await pool.query(query, values);
             console.log(`${username} created successfully`)
              const user = {
                 id,
@@ -65,16 +70,16 @@ class Usermodel{
                 resettoken: null,
                 isAdmin:null
               };
-
-            return user
-        }catch(err){
-            console.log(err);
-            return Promise.reject(err)
+            
+            return user  
+        }catch(error){
+            console.log(error);
+            return Promise.reject(error)
         }
     }
 
     async updateResettoken (token:string,id:string):Promise<null>{
-        const query = `UPDATE users SET resettoken = ${token} WHERE id = ${id};`;
+        const query = `UPDATE "user" SET resettoken = ${token} WHERE id = ${id};`;
         try{
             const result = await pool.query(query);
             console.log(`token updated successfully`)
@@ -86,7 +91,7 @@ class Usermodel{
     }
 
     async updateResetandPassword(newpassword:string,id:string):Promise<null>{
-        const query = `UPDATE users SET resettoken = '${''}', password = '${newpassword}' WHERE id = '${id}';`;
+        const query = `UPDATE "user" SET resettoken = '${''}', password = '${newpassword}' WHERE id = '${id}';`;
 
         try{
             const result = await pool.query(query);

@@ -1,17 +1,17 @@
 import sendResetToken from '../../utils/sendResetToken';
-const {sendEmailConfirmation} = require('../utils/sendEmail')
+import { sendEmailConfirmation } from '../../utils/sendEmail';
 const jwt = require('jsonwebtoken');
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response } from 'express';
 import validateEmail from '../../utils/validateEmail';
 import Usermodel from '../../models/userModel';
-import { attachCookiesToResponse } from '../../utils/jwt';
+import { createJWT } from '../../utils/jwt';
 import createTokenUser from '../../utils/createTokenUser';
 import bcrypt from 'bcrypt'
 
 class User {
     async register(req: Request, res: Response){
-      
+     
         const {email,username,password} = req.body
         if (!username || !email || !password){
         res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty')
@@ -24,14 +24,14 @@ class User {
 
         if(userExists || emailExists){
           return res.status(StatusCodes.BAD_REQUEST).json('user already exists')
-        }
+        } 
 
         try{
           const savedUser = await Usermodel.prototype.createUser(username,email,password)
           const tokenUser = createTokenUser(savedUser)
-          attachCookiesToResponse({res,user:tokenUser})
-          res.status(StatusCodes.OK).json({user:tokenUser})
-          sendEmailConfirmation(savedUser.email)
+          const cookie = createJWT(tokenUser)
+          console.log(cookie);
+          res.status(StatusCodes.OK).json({cookie,savedUser});
         }catch(err){
           return res.status(StatusCodes.BAD_REQUEST).json('err creating user')
         }
@@ -55,7 +55,7 @@ class User {
            }
            const { password: foundUserPassword, ...others } = foundUser;
            const tokenUser = createTokenUser(others);
-           let cookie = attachCookiesToResponse({ res, user: tokenUser });
+           const cookie = createJWT(tokenUser)
            return res.status(StatusCodes.OK).json({ user: others,cookie });
           }
           catch(err){
@@ -90,7 +90,7 @@ class User {
           console.log(email);
           const hashedPassword = await bcrypt.hash(newPassword, 10);
           if(email === sessionUser.email){
-              await Usermodel.prototype.updateResetandPassword(newPassword,sessionUser.id)
+              const updated = await Usermodel.prototype.updateResetandPassword(hashedPassword,sessionUser.id)
               res.status(StatusCodes.OK).json('password updated successfully');
           }
           else{
