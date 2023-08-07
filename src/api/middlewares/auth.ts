@@ -2,11 +2,16 @@ import { Request, Response,NextFunction } from 'express';
 import { isTokenValid } from "../../utils/jwt";
 import { StatusCodes } from 'http-status-codes';
 import Usermodel from '../../models/userModel';
+
 interface User {
     userId: string;
     username: string;
   }
   
+  interface TokenPayload {
+    username: string;
+    userId: string;
+  }
 const authUser = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer")) {
@@ -14,10 +19,9 @@ const authUser = async (req: Request, res: Response, next: NextFunction) => {
     }
   
     const tokenData = authHeader.split(" ");
-    const token = tokenData[1];
-  
+    const token = tokenData[1]; 
     try {
-      const { username, userId } =  isTokenValid(token);
+      const { username, userId } =  isTokenValid(token) as TokenPayload;
       req.user = { username, userId };
       next();
     } catch (error) {
@@ -38,6 +42,4 @@ const authUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
 
-
-
-export {authUser,isAdmin} 
+export  {authUser,isAdmin} 

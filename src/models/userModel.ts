@@ -33,7 +33,7 @@ class Usermodel{
       
     
     async findEmail(email: string): Promise<User | null>{
-        const query = `SELECT * FROM "user" WHERE username = '${email}';`;
+        const query = `SELECT * FROM "user" WHERE email = '${email}';`;
         try{
             const result = await pool.query(query)
             if (result.rows.length === 0) {
@@ -79,7 +79,21 @@ class Usermodel{
     }
 
     async updateResettoken (token:string,id:string):Promise<null>{
-        const query = `UPDATE "user" SET resettoken = ${token} WHERE id = ${id};`;
+      const query = `UPDATE "user" SET resettoken = $1 WHERE id = $2;`;
+      const values = [token, id];
+        try{
+            const result = await pool.query(query,values);
+            console.log(`token updated successfully`)
+            return null
+        }catch(err){
+            console.log(err);
+            return Promise.reject(err)
+        }
+    }
+
+    async updateResetandPassword(newpassword:string,id:string):Promise<null>{
+        const query = `UPDATE "user" SET resettoken = '${null}', password = '${newpassword}' WHERE id = '${id}';`;
+
         try{
             const result = await pool.query(query);
             console.log(`token updated successfully`)
@@ -90,17 +104,16 @@ class Usermodel{
         }
     }
 
-    async updateResetandPassword(newpassword:string,id:string):Promise<null>{
-        const query = `UPDATE "user" SET resettoken = '${''}', password = '${newpassword}' WHERE id = '${id}';`;
-
-        try{
-            const result = await pool.query(query);
-            console.log(`token updated successfully`)
-            return null
-        }catch(err){
-            console.log(err);
-            return Promise.reject(err)
-        }
+    async profileUpdate(newProfilePic:string,id:string){
+      const query = `UPDATE "user" SET profile_pic = '${newProfilePic}' WHERE id = '${id}';`;
+      try{
+        const result = await pool.query(query);
+        console.log(`picture updated successfully`)
+        return null
+      }catch(err){
+        console.log(err);
+        return Promise.reject(err)
+      }
     }
 }
 

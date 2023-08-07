@@ -20,15 +20,9 @@ const createJWT = ({userId,username}:user) => {
   return token;
 };
 
-const isTokenValid = (token: string): JwtPayload => jwt.verify(token, secretKey) as JwtPayload;
-
-// const attachCookiesToResponse = ({ user }:attachCookies):string => {
-//   //const token = createJWT({ payload:user });
-//   return token
-// };
+const isTokenValid = (token: string) => jwt.verify(token, secretKey) as JwtPayload;
 
  export {
   createJWT,
-  isTokenValid,
-  // attachCookiesToResponse,
+  isTokenValid
 };

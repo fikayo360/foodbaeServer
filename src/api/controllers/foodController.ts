@@ -16,8 +16,8 @@ class Food {
         catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err)
         }
-
     }
+    
     async updateFood(req: Request, res: Response){
         const {id} = req.params
         const {ntitle,nimage,ncategory,ndescription,nprice} = req.body

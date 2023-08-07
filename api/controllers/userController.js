@@ -24,13 +24,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sendResetToken_1 = __importDefault(require("../../utils/sendResetToken"));
-const jwt = require('jsonwebtoken');
 const http_status_codes_1 = require("http-status-codes");
 const validateEmail_1 = __importDefault(require("../../utils/validateEmail"));
 const userModel_1 = __importDefault(require("../../models/userModel"));
 const jwt_1 = require("../../utils/jwt");
 const createTokenUser_1 = __importDefault(require("../../utils/createTokenUser"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class User {
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -87,15 +87,17 @@ class User {
         return __awaiter(this, void 0, void 0, function* () {
             const { email } = req.body;
             const sessionUser = yield userModel_1.default.prototype.findEmail(email);
+            console.log(sessionUser);
+            if ((0, validateEmail_1.default)(email) === false) {
+                res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('invalid mail');
+            }
             if (!sessionUser) {
                 return res.status(404).json('that user does not exist');
             }
             try {
                 let reset = (0, sendResetToken_1.default)(sessionUser.email);
-                sessionUser.resettoken = reset;
-                yield userModel_1.default.prototype.updateResettoken(reset, sessionUser.id);
-                console.log(sessionUser);
-                res.status(200).json('Reset token sent successfully');
+                const updateToken = yield userModel_1.default.prototype.updateResettoken(reset, sessionUser.id);
+                res.status(200).json(` Reset token sent successfully`);
             }
             catch (err) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('oops an error occured');
@@ -105,18 +107,35 @@ class User {
     changePassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { token, email, newPassword } = req.body;
+            const secretKey = process.env.JWT_SECRET || 'defaultSecretKey';
             const sessionUser = yield userModel_1.default.prototype.findEmail(email);
             try {
-                const { email } = jwt.verify(token, process.env.JWT_SECRET);
-                console.log(email);
+                const decoded = jsonwebtoken_1.default.verify(token, secretKey);
+                console.log(decoded);
                 const hashedPassword = yield bcrypt_1.default.hash(newPassword, 10);
-                if (email === sessionUser.email) {
+                if (decoded.email === (sessionUser === null || sessionUser === void 0 ? void 0 : sessionUser.email)) {
                     const updated = yield userModel_1.default.prototype.updateResetandPassword(hashedPassword, sessionUser.id);
                     res.status(http_status_codes_1.StatusCodes.OK).json('password updated successfully');
                 }
                 else {
                     return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('wrong user');
                 }
+            }
+            catch (err) {
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('an error occurred');
+            }
+        });
+    }
+    updateProfile(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { newProfilePic } = req.body;
+            const username = req.user.username;
+            const id = req.user.userId;
+            try {
+                const userExists = yield userModel_1.default.prototype.findUser(username);
+                console.log(userExists);
+                const updatepicture = yield userModel_1.default.prototype.profileUpdate(newProfilePic, id);
+                res.status(http_status_codes_1.StatusCodes.OK).json(`profile updated successfully`);
             }
             catch (err) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('an error occurred');

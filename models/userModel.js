@@ -37,7 +37,7 @@ class Usermodel {
     }
     findEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT * FROM "user" WHERE username = '${email}';`;
+            const query = `SELECT * FROM "user" WHERE email = '${email}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 if (result.rows.length === 0) {
@@ -85,9 +85,10 @@ class Usermodel {
     }
     updateResettoken(token, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `UPDATE "user" SET resettoken = ${token} WHERE id = ${id};`;
+            const query = `UPDATE "user" SET resettoken = $1 WHERE id = $2;`;
+            const values = [token, id];
             try {
-                const result = yield connect_1.default.query(query);
+                const result = yield connect_1.default.query(query, values);
                 console.log(`token updated successfully`);
                 return null;
             }
@@ -99,10 +100,24 @@ class Usermodel {
     }
     updateResetandPassword(newpassword, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `UPDATE "user" SET resettoken = '${''}', password = '${newpassword}' WHERE id = '${id}';`;
+            const query = `UPDATE "user" SET resettoken = '${null}', password = '${newpassword}' WHERE id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`token updated successfully`);
+                return null;
+            }
+            catch (err) {
+                console.log(err);
+                return Promise.reject(err);
+            }
+        });
+    }
+    profileUpdate(newProfilePic, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `UPDATE "user" SET profile_pic = '${newProfilePic}' WHERE id = '${id}';`;
+            try {
+                const result = yield connect_1.default.query(query);
+                console.log(`picture updated successfully`);
                 return null;
             }
             catch (err) {

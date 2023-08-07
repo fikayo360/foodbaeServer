@@ -8,7 +8,7 @@ interface JwtPayload {
   }
 
 function generateToken(email: string, expiresIn: number): string {
-    const secretKey: Secret = process.env.JWT_SECRET as Secret;
+    const secretKey: Secret = process.env.JWT_SECRET || 'secretkey';
     const payload: JwtPayload = { email };
     const token = jwt.sign(payload, secretKey, { expiresIn });
     return token;

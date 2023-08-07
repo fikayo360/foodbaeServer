@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const nodemailer = __importStar(require("nodemailer"));
 function generateToken(email, expiresIn) {
-    const secretKey = process.env.JWT_SECRET;
+    const secretKey = process.env.JWT_SECRET || 'secretkey';
     const payload = { email };
     const token = jsonwebtoken_1.default.sign(payload, secretKey, { expiresIn });
     return token;
