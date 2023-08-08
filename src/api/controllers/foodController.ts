@@ -56,10 +56,10 @@ class Food {
         try{
             let items;
             if (foodCategory){
-                let items = await FoodModel.prototype.getFoodByCategory(foodCategory);
+                 items = await FoodModel.prototype.getFoodByCategory(foodCategory);
             }
             else{
-                let items = await FoodModel.prototype.getAllFoods()
+                 items = await FoodModel.prototype.getAllFoods()
             }
             res.status(StatusCodes.OK).json(items)
         }

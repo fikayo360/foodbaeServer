@@ -74,10 +74,10 @@ class Food {
             try {
                 let items;
                 if (foodCategory) {
-                    let items = yield foodModel_1.default.prototype.getFoodByCategory(foodCategory);
+                    items = yield foodModel_1.default.prototype.getFoodByCategory(foodCategory);
                 }
                 else {
-                    let items = yield foodModel_1.default.prototype.getAllFoods();
+                    items = yield foodModel_1.default.prototype.getAllFoods();
                 }
                 res.status(http_status_codes_1.StatusCodes.OK).json(items);
             }

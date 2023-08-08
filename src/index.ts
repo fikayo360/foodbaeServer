@@ -15,6 +15,7 @@ app.use(express.json());
 
 const userRoute = require('./api/routes/userRoutes')
 const orderRoute = require('./api/routes/orderRoutes')
+const foodRoute = require('./api/routes/foodRoutes')
 // rest of the packages
 //const morgan = require('morgan');
 //const fileUpload = require('express-fileupload');
@@ -27,6 +28,7 @@ const orderRoute = require('./api/routes/orderRoutes')
 // app.use(cookieParser(process.env.JWT_SECRET));
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/order',orderRoute)
+app.use('/api/v1/food',foodRoute)
 // app.use('/api/v1/savedPost', savedPostRoute);
 // app.use('/api/v1/post', postRoute);
 // app.use('/api/v1/notification', notificationRoute);

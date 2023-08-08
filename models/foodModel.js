@@ -18,13 +18,13 @@ class FoodModel {
     createFood(title, image, category, description, price) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = (0, uuid_1.v4)();
-            const query = `INSERT INTO "food" (title, image, description,category, price)
-        VALUES (${id},${title},${image},${description},${category},${price});`;
+            const query = `INSERT INTO food (id,title, image, description,category, price)
+        VALUES ('${id}','${title}','${image}','${description}','${category}','${price}');`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`created successfully`);
                 const food = {
-                    title, image, category, description, price
+                    id, title, image, category, description, price
                 };
                 return food;
             }
@@ -36,7 +36,8 @@ class FoodModel {
     }
     updateFood(id, ntitle, nimage, ncategory, ndescription, nprice) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SET title = ${ntitle}, image = ${nimage}, category = ${ncategory}, description = ${ndescription}, price = ${nprice} WHERE id = ${id};`;
+            const query = `UPDATE food 
+        SET id = '${id}', title = '${ntitle}', image = '${nimage}', category = '${ncategory}', description = '${ndescription}', price = '${nprice}' WHERE id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`created successfully`);
@@ -50,7 +51,7 @@ class FoodModel {
     }
     deleteFood(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `DELETE FROM "food" WHERE id = ${id};`;
+            const query = `DELETE FROM food WHERE id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`deleted successfully`);
@@ -64,14 +65,14 @@ class FoodModel {
     }
     getFoodByTitle(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT * FROM "food" WHERE title = ${name};`;
+            const query = `SELECT * FROM food WHERE title = '${name}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 if (result.rows.length === 0) {
                     return null;
                 }
                 else {
-                    const food = JSON.parse(result.rows[0].toJSON());
+                    const food = result.rows;
                     return food;
                 }
             }
@@ -83,7 +84,7 @@ class FoodModel {
     }
     getFoodByCategory(category) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT * FROM "food" WHERE category = ${category};`;
+            const query = `SELECT * FROM food WHERE category = '${category}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 if (result.rows.length === 0) {
@@ -102,7 +103,7 @@ class FoodModel {
     }
     getAllFoods() {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT * FROM "food";`;
+            const query = `SELECT * FROM food;`;
             try {
                 const result = yield connect_1.default.query(query);
                 if (result.rows.length === 0) {
