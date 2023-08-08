@@ -111,7 +111,7 @@ class User {
       
       try{
         const userExists = await Usermodel.prototype.findUser(username)
-        console.log(userExists);
+       
         const updatepicture = await Usermodel.prototype.profileUpdate(newProfilePic,id)
         res.status(StatusCodes.OK).json(`profile updated successfully`)
       }catch(err){

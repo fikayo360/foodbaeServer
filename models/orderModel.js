@@ -16,18 +16,19 @@ const connect_1 = __importDefault(require("../db/connect"));
 const uuid_1 = require("uuid");
 const userModel_1 = __importDefault(require("./userModel"));
 class OrderModel {
-    createOrder(username, products, amount, address, status) {
+    createOrder(username, products, amount, address) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = (0, uuid_1.v4)();
             const user = yield userModel_1.default.prototype.findUser(username);
-            const user_id = user === null || user === void 0 ? void 0 : user.id;
-            const query = `INSERT INTO "order" (id,userId,products, amount, address,status)
-        VALUES (${id},${user_id},${products},${amount},${address},${status});`;
+            const userId = user === null || user === void 0 ? void 0 : user.id;
+            const productsJson = JSON.stringify(products);
+            const query = `INSERT INTO "order" (id,user_id,products, amount, address)
+        VALUES ('${id}','${userId}','${productsJson}','${amount}','${address}');`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`created successfully`);
                 const order = {
-                    id, user_id, products, amount, address, status
+                    id, userId, products, amount, address
                 };
                 return order;
             }
@@ -39,7 +40,7 @@ class OrderModel {
     }
     deleteOrder(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `DELETE FROM "order" WHERE id = ${id};`;
+            const query = `DELETE FROM "order" WHERE id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`deleted successfully`);
@@ -53,7 +54,7 @@ class OrderModel {
     }
     updateOrderStatus(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SET status = ${true} WHERE id = ${id};`;
+            const query = `UPDATE "order" SET status = ${true} WHERE id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 console.log(`updated successfully`);
@@ -67,14 +68,14 @@ class OrderModel {
     }
     getOrdersById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT * FROM "order" WHERE id = ${id};`;
+            const query = `SELECT * FROM "order" JOIN "user" ON user_id = '${id}';`;
             try {
                 const result = yield connect_1.default.query(query);
                 if (result.rows.length === 0) {
                     return null;
                 }
                 else {
-                    const order = JSON.parse(result.rows[0].toJSON());
+                    const order = result.rows;
                     return order;
                 }
             }

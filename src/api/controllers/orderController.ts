@@ -1,23 +1,26 @@
 import OrderModel from '../../models/orderModel';
 import { Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
+import Usermodel from '../../models/userModel';
 
 class Order {
     async createOrder(req:Request,res:Response){
-       const {username} = req.params
-        const {products,amount,address,status} = req.body
-        if(!products || !amount || !address || !status){
+        const username = req.user.username
+        const {products,amount,address} = req.body
+        if(products.length === 0 ){
+            return res.status(StatusCodes.BAD_REQUEST).json('products cant be empty');
+        }
+        if(!amount || !address){
             return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty');
         }
         try{
-            const neworder = await OrderModel.prototype.createOrder(username,products,amount,address,status)
+            const neworder = await OrderModel.prototype.createOrder(username,products,amount,address)
             console.log(neworder)
             res.status(StatusCodes.OK).json("product added")
         }
         catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err)
         }
-
     }
 
     async deleteOrderById(req: Request, res: Response){
@@ -41,10 +44,10 @@ class Order {
         }
     }
 
-    async getFoodById(req: Request, res: Response){
-        const {id} = req.params
+    async getOrderById(req: Request, res: Response){
+        const {userId} = req.params
         try{
-            const searchFood = await OrderModel.prototype.getOrdersById(id)
+            const searchFood = await OrderModel.prototype.getOrdersById(userId)
             res.status(StatusCodes.OK).json(searchFood)
         }catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")

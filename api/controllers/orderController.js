@@ -17,13 +17,16 @@ const http_status_codes_1 = require("http-status-codes");
 class Order {
     createOrder(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username } = req.params;
-            const { products, amount, address, status } = req.body;
-            if (!products || !amount || !address || !status) {
+            const username = req.user.username;
+            const { products, amount, address } = req.body;
+            if (products.length === 0) {
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('products cant be empty');
+            }
+            if (!amount || !address) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json('fields cant be empty');
             }
             try {
-                const neworder = yield orderModel_1.default.prototype.createOrder(username, products, amount, address, status);
+                const neworder = yield orderModel_1.default.prototype.createOrder(username, products, amount, address);
                 console.log(neworder);
                 res.status(http_status_codes_1.StatusCodes.OK).json("product added");
             }
@@ -56,11 +59,11 @@ class Order {
             }
         });
     }
-    getFoodById(req, res) {
+    getOrderById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
+            const { userId } = req.params;
             try {
-                const searchFood = yield orderModel_1.default.prototype.getOrdersById(id);
+                const searchFood = yield orderModel_1.default.prototype.getOrdersById(userId);
                 res.status(http_status_codes_1.StatusCodes.OK).json(searchFood);
             }
             catch (err) {

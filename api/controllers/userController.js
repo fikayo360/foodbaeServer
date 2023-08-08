@@ -133,7 +133,6 @@ class User {
             const id = req.user.userId;
             try {
                 const userExists = yield userModel_1.default.prototype.findUser(username);
-                console.log(userExists);
                 const updatepicture = yield userModel_1.default.prototype.profileUpdate(newProfilePic, id);
                 res.status(http_status_codes_1.StatusCodes.OK).json(`profile updated successfully`);
             }

@@ -10,25 +10,25 @@ interface Product {
 
   interface Order{
     id: string;
-    user_id: string | undefined;
+    userId: string | undefined;
     products: Product[];
     amount: number;
     address: string;
-    status: string
   }
 
 class OrderModel {
-    async createOrder(username:string,products:Product[],amount:number,address:string,status:string):Promise<Order | null>{
+    async createOrder(username:string,products:Product[],amount:number,address:string):Promise<Order | null>{
         const id = uuidv4();
         const user = await Usermodel.prototype.findUser(username)
-        const user_id = user?.id
-        const query= `INSERT INTO "order" (id,userId,products, amount, address,status)
-        VALUES (${id},${user_id},${products},${amount},${address},${status});`
+        const userId = user?.id
+        const productsJson = JSON.stringify(products);
+        const query= `INSERT INTO "order" (id,user_id,products, amount, address)
+        VALUES ('${id}','${userId}','${productsJson}','${amount}','${address}');`
         try{
             const result = await pool.query(query);
             console.log(`created successfully`)
                 const order = {
-                id,user_id,products, amount, address,status
+                id,userId,products, amount, address
                 };
             return order
         }catch(err){
@@ -38,7 +38,7 @@ class OrderModel {
     }
      
     async deleteOrder(id:string):Promise<null>{
-        const query= `DELETE FROM "order" WHERE id = ${id};`
+        const query= `DELETE FROM "order" WHERE id = '${id}';`
         try{
             const result = await pool.query(query);
             console.log(`deleted successfully`)
@@ -50,7 +50,7 @@ class OrderModel {
     }
 
     async updateOrderStatus(id:string):Promise<null>{
-        const query= `SET status = ${true} WHERE id = ${id};`
+        const query= `UPDATE "order" SET status = ${true} WHERE id = '${id}';`
         try{
             const result = await pool.query(query);
             console.log(`updated successfully`)
@@ -61,14 +61,14 @@ class OrderModel {
         }
     }
 
-    async getOrdersById(id:string):Promise<Order|null>{
-        const query= `SELECT * FROM "order" WHERE id = ${id};`
+    async getOrdersById(id:string){
+        const query = `SELECT * FROM "order" JOIN "user" ON user_id = '${id}';`
         try{
             const result = await pool.query(query);
             if (result.rows.length === 0) {
                 return null;
                 } else {
-                const order = JSON.parse(result.rows[0].toJSON());
+                const order = result.rows;
                 return order;
             }
         }catch(err){
