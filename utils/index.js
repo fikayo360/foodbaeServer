@@ -9,6 +9,5 @@ const createTokenUser_1 = __importDefault(require("./createTokenUser")); // Use 
 module.exports = {
     createJWT: jwt_1.createJWT,
     isTokenValid: jwt_1.isTokenValid,
-    attachCookiesToResponse: jwt_1.attachCookiesToResponse,
     createTokenUser: createTokenUser_1.default
 };

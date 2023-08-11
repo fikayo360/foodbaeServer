@@ -1,4 +1,4 @@
-import { createJWT, isTokenValid, attachCookiesToResponse } from './jwt';
+import { createJWT, isTokenValid } from './jwt';
 import createTokenUser from './createTokenUser'; // Use the "import = require()" syntax for CommonJS
 
 //import { checkPermissions } from './checkPermissions'; // ES module import
@@ -6,6 +6,5 @@ import createTokenUser from './createTokenUser'; // Use the "import = require()"
 module.exports = {
   createJWT,
   isTokenValid,
-  attachCookiesToResponse,
   createTokenUser
 };
