@@ -9,15 +9,17 @@ import createTokenUser from '../../utils/createTokenUser';
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 
+
 class User {
+
     async register(req: Request, res: Response){
      
         const {email,username,password} = req.body
         if (!username || !email || !password){
-        res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty')
+        return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty')
       }
         if(validateEmail(email) === false){
-          res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
+          return res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
       }
         const userExists = await Usermodel.prototype.findUser(username)
         const emailExists = await Usermodel.prototype.findEmail(email)
@@ -31,7 +33,7 @@ class User {
           const tokenUser = createTokenUser(savedUser)
           const cookie = createJWT(tokenUser)
           console.log(cookie);
-          res.status(StatusCodes.OK).json({cookie,savedUser});
+          return res.status(StatusCodes.OK).json({cookie,savedUser});
         }catch(err){
           return res.status(StatusCodes.BAD_REQUEST).json('err creating user')
         }
@@ -68,7 +70,7 @@ class User {
       const sessionUser = await Usermodel.prototype.findEmail(email)
       console.log(sessionUser);
       if(validateEmail(email) === false){
-        res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
+        return res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
     }
       if (!sessionUser){
           return res.status(404).json('that user does not exist')
@@ -76,7 +78,7 @@ class User {
       try{
       let reset = sendResetToken(sessionUser.email)
       const updateToken = await Usermodel.prototype.updateResettoken(reset,sessionUser.id)
-      res.status(200).json(` Reset token sent successfully`)
+      return res.status(200).json(` Reset token sent successfully`)
       }
       catch(err){
           return res.status(StatusCodes.BAD_REQUEST).json('oops an error occured')
@@ -93,7 +95,7 @@ class User {
           const hashedPassword = await bcrypt.hash(newPassword, 10);
           if(decoded.email === sessionUser?.email){
               const updated = await Usermodel.prototype.updateResetandPassword(hashedPassword,sessionUser!.id)
-              res.status(StatusCodes.OK).json('password updated successfully');
+              return res.status(StatusCodes.OK).json('password updated successfully');
           }
           else{
               return res.status(StatusCodes.BAD_REQUEST).json('wrong user');
@@ -113,7 +115,7 @@ class User {
         const userExists = await Usermodel.prototype.findUser(username)
        
         const updatepicture = await Usermodel.prototype.profileUpdate(newProfilePic,id)
-        res.status(StatusCodes.OK).json(`profile updated successfully`)
+        return res.status(StatusCodes.OK).json(`profile updated successfully`)
       }catch(err){
         return res.status(StatusCodes.BAD_REQUEST).json('an error occurred')
       }
