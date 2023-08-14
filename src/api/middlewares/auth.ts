@@ -29,21 +29,24 @@ const authUser = async (req: Request, res: Response, next: NextFunction) => {
     }
   };
 
-  const isAdmin =  async (req: Request, res: Response, next: NextFunction) => {
-            const username = req.user.username
-            console.log(username);
-            const foundUser = await Usermodel.prototype.findUser(username)
-            console.log(foundUser);
-            try{
-              if(foundUser?.isAdmin === true){
-                next();
-            }else{
-               return res.status(403).json("access denied not admin ")
-            } 
-            }catch(error){
-              res.status(StatusCodes.UNAUTHORIZED).json("an error occurred nigga");
-            }
+  const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const username = req.user.username;
+    console.log(username);
+    
+    try {
+        const foundUser = await Usermodel.prototype.findUser(username);
+        console.log(foundUser);
+
+        if (foundUser?.isAdmin) {
+            next();
+        } else {
+            return res.status(403).json("Access denied: not an admin");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("An error occurred");
     }
+};
 
 
 export  {authUser,isAdmin} 
