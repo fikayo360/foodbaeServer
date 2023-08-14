@@ -29,16 +29,13 @@ const authUser = async (req: Request, res: Response, next: NextFunction) => {
     }
   };
 
-  const isAdmin =  (req: Request, res: Response, next: NextFunction) => {
-        authUser (req,res,async()=>{
+  const isAdmin =  async (req: Request, res: Response, next: NextFunction) => {
             const foundUser = await Usermodel.prototype.findUser(req.user.username)
             if(foundUser?.isAdmin){
                 next();
             }else{
-               return res.status(403).json("access denied")
-            }
-         })
-        
+               return res.status(403).json("access denied not admin ")
+            }        
     }
 
 
