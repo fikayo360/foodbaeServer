@@ -9,7 +9,7 @@ interface User {
     password:string;
     profile_pic:string | null;
     resettoken: string | null;
-    isAdmin: boolean | null;
+    isadmin: boolean | null;
   }
 
 class Usermodel{
@@ -68,7 +68,7 @@ class Usermodel{
                 password,
                 profile_pic: null,
                 resettoken: null,
-                isAdmin:null
+                isadmin:null
               };
             
             return user  
