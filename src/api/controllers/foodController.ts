@@ -42,7 +42,7 @@ class Food {
     }
 
     async getFoodByName(req: Request, res: Response){
-        const {name} = req.body
+        const {name} = req.params
         try{
             const searchFood = await FoodModel.prototype.getFoodByTitle(name)
             res.status(StatusCodes.OK).json(searchFood)
