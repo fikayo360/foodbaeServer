@@ -45,6 +45,9 @@ class Food {
         const {name} = req.params
         try{
             const searchFood = await FoodModel.prototype.getFoodByTitle(name)
+            if(!searchFood){
+                return res.status(StatusCodes.BAD_REQUEST).json("food not found")
+            }
             res.status(StatusCodes.OK).json(searchFood)
         }catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
