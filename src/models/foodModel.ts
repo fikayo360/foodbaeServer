@@ -58,7 +58,7 @@ class FoodModel{
             if (result.rows.length === 0) {
                 return null;
               } else {
-                const food = result.rows;
+                const food = result.rows[0];
                 return food;
             }
         }catch(err){
