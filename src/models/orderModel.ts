@@ -14,6 +14,7 @@ interface Product {
     products: Product[];
     amount: number;
     address: string;
+    status:boolean;
   }
 
 class OrderModel {
@@ -22,13 +23,14 @@ class OrderModel {
         const user = await Usermodel.prototype.findUser(username)
         const userId = user?.id
         const productsJson = JSON.stringify(products);
+        const status = false
         const query= `INSERT INTO "order" (id,user_id,products, amount, address)
         VALUES ('${id}','${userId}','${productsJson}','${amount}','${address}');`
         try{
             const result = await pool.query(query);
             console.log(`created successfully`)
                 const order = {
-                id,userId,products, amount, address
+                id,userId,products, amount, address,status
                 };
             return order
         }catch(err){
@@ -62,7 +64,7 @@ class OrderModel {
     }
 
     async getOrdersById(id:string){
-        const query = `SELECT * FROM "order" JOIN "user" ON user_id = '${id}';`
+        const query = `SELECT * FROM "order" JOIN "user" ON user_id = '${id}' WHERE status = 'false';`
         try{
             const result = await pool.query(query);
             if (result.rows.length === 0) {
