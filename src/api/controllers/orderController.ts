@@ -16,7 +16,7 @@ class Order {
         try{
             const neworder = await OrderModel.prototype.createOrder(username,products,amount,address)
             console.log(neworder)
-            res.status(StatusCodes.OK).json("product added")
+            res.status(StatusCodes.OK).json(neworder)
         }
         catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err)
