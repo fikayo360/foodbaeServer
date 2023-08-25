@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
 import Usermodel from '../../models/userModel';
 
+const orderModel = new OrderModel();
+
 class Order {
     async createOrder(req:Request,res:Response){
         const username = req.user.username
@@ -14,7 +16,7 @@ class Order {
             return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty');
         }
         try{
-            const neworder = await OrderModel.prototype.createOrder(username,products,amount,address)
+            const neworder = await orderModel.createOrder(username,products,amount,address)
             console.log(neworder)
             res.status(StatusCodes.OK).json(neworder)
         }
@@ -26,7 +28,7 @@ class Order {
     async deleteOrderById(req: Request, res: Response){
         const {id} = req.params
         try{
-            const deleted = await OrderModel.prototype.deleteOrder(id)
+            const deleted = await orderModel.deleteOrder(id)
             res.status(StatusCodes.OK).json("order deleted")
         }
         catch(err){
@@ -37,7 +39,7 @@ class Order {
     async updateOrderStatus(req: Request, res: Response){
         const {id} = req.params
         try{
-            const updated = await OrderModel.prototype.updateOrderStatus(id)
+            const updated = await orderModel.updateOrderStatus(id)
             res.status(StatusCodes.OK).json("order updated")
         }catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
@@ -47,7 +49,7 @@ class Order {
     async getOrderById(req: Request, res: Response){
         const {userId} = req.params
         try{
-            const searchFood = await OrderModel.prototype.getOrdersById(userId)
+            const searchFood = await orderModel.getOrdersById(userId)
             res.status(StatusCodes.OK).json(searchFood)
         }catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
@@ -57,7 +59,7 @@ class Order {
     async allOrders(req: Request, res: Response){
        
         try{
-            let items = await OrderModel.prototype.getAllOrders()
+            let items = await orderModel.getAllOrders()
             res.status(StatusCodes.OK).json(items)
         }
         catch(err){

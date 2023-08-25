@@ -10,8 +10,9 @@ import bcrypt from 'bcrypt'
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 
 
-class User {
+const userModel = new Usermodel()
 
+class User {  
     async register(req: Request, res: Response){
      
         const {email,username,password} = req.body
@@ -21,15 +22,15 @@ class User {
         if(validateEmail(email) === false){
           return res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
       }
-        const userExists = await Usermodel.prototype.findUser(username)
-        const emailExists = await Usermodel.prototype.findEmail(email)
+        const userExists = await userModel.findUser(username)
+        const emailExists = await userModel.findEmail(email)
 
         if(userExists || emailExists){
           return res.status(StatusCodes.BAD_REQUEST).json('user already exists')
         } 
 
         try{
-          const savedUser = await Usermodel.prototype.createUser(username,email,password)
+          const savedUser = await userModel.createUser(username,email,password)
           const tokenUser = createTokenUser(savedUser)
           const cookie = createJWT(tokenUser)
           console.log(cookie);
@@ -41,12 +42,13 @@ class User {
       }
 
      async login(req: Request, res: Response){
+     
       const {username,password} = req.body
       if (!username || !password){
           return res.status(500).json("pls ensure fields are not empty ")
         }
         try{  
-          const foundUser = await Usermodel.prototype.findUser(username)
+          const foundUser = await userModel.findUser(username)
           console.log(foundUser);
           if(!foundUser){
               return res.status(StatusCodes.BAD_REQUEST).json('that user does not exist')
@@ -66,8 +68,9 @@ class User {
      }
 
      async forgotPassword(req: Request, res: Response){
+     
       const {email} = req.body
-      const sessionUser = await Usermodel.prototype.findEmail(email)
+      const sessionUser = await userModel.findEmail(email)
       console.log(sessionUser);
       if(validateEmail(email) === false){
         return res.status(StatusCodes.BAD_REQUEST).json('invalid mail')
@@ -77,7 +80,7 @@ class User {
       }
       try{
       let reset = sendResetToken(sessionUser.email)
-      const updateToken = await Usermodel.prototype.updateResettoken(reset,sessionUser.id)
+      const updateToken = await userModel.updateResettoken(reset,sessionUser.id)
       return res.status(200).json(` Reset token sent successfully`)
       }
       catch(err){
@@ -86,15 +89,16 @@ class User {
      }
 
      async changePassword(req: Request, res: Response){
+     
       const {token,email,newPassword} = req.body
       const secretKey: Secret = process.env.JWT_SECRET || 'defaultSecretKey';
-      const sessionUser = await Usermodel.prototype.findEmail(email)
+      const sessionUser = await userModel.findEmail(email)
         try{
           const decoded = jwt.verify(token,secretKey) as JwtPayload;
           console.log(decoded);
           const hashedPassword = await bcrypt.hash(newPassword, 10);
           if(decoded.email === sessionUser?.email){
-              const updated = await Usermodel.prototype.updateResetandPassword(hashedPassword,sessionUser!.id)
+              const updated = await userModel.updateResetandPassword(hashedPassword,sessionUser!.id)
               return res.status(StatusCodes.OK).json('password updated successfully');
           }
           else{
@@ -107,14 +111,14 @@ class User {
      }
 
     async updateProfile(req: Request, res: Response){
+     
       const {newProfilePic} = req.body
       const username = req.user.username
       const id = req.user.userId
       
       try{
-        const userExists = await Usermodel.prototype.findUser(username)
-       
-        const updatepicture = await Usermodel.prototype.profileUpdate(newProfilePic,id)
+        const userExists = await userModel.findUser(username)
+        const updatepicture = await userModel.profileUpdate(newProfilePic,id)
         return res.status(StatusCodes.OK).json(`profile updated successfully`)
       }catch(err){
         return res.status(StatusCodes.BAD_REQUEST).json('an error occurred')

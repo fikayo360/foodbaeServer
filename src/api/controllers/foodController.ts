@@ -2,6 +2,7 @@ import FoodModel from "../../models/foodModel"
 import { Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
 
+const foodModel = new FoodModel()
 class Food {
     async createFood(req:Request,res:Response){
         const {title,image,category,description,price} = req.body
@@ -9,7 +10,7 @@ class Food {
             return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty');
         }
         try{
-            const newproduct = await FoodModel.prototype.createFood(title,image,category,description,price)
+            const newproduct = await foodModel.createFood(title,image,category,description,price)
             console.log(newproduct)
             res.status(StatusCodes.OK).json("product added")
         }
@@ -22,7 +23,7 @@ class Food {
         const {id} = req.params
         const {ntitle,nimage,ncategory,ndescription,nprice} = req.body
         try{
-            const updatedFood = await FoodModel.prototype.updateFood(id,ntitle,nimage,ncategory,ndescription,nprice)
+            const updatedFood = await foodModel.updateFood(id,ntitle,nimage,ncategory,ndescription,nprice)
             res.status(StatusCodes.OK).json("Product updated")
         }catch(err){
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
@@ -33,7 +34,7 @@ class Food {
     async deleteFoodBYId(req: Request, res: Response){
         const {id} = req.params
         try{
-            const deleted = await FoodModel.prototype.deleteFood(id)
+            const deleted = await foodModel.deleteFood(id)
             res.status(StatusCodes.OK).json("food deleted")
         }
         catch(err){
@@ -44,7 +45,7 @@ class Food {
     async getFoodByName(req: Request, res: Response){
         const {name} = req.params
         try{
-            const searchFood = await FoodModel.prototype.getFoodByTitle(name)
+            const searchFood = await foodModel.getFoodByTitle(name)
             if(!searchFood){
                 return res.status(StatusCodes.BAD_REQUEST).json("food not found")
             }
@@ -59,10 +60,10 @@ class Food {
         try{
             let items;
             if (foodCategory){
-                 items = await FoodModel.prototype.getFoodByCategory(foodCategory);
+                 items = await foodModel.getFoodByCategory(foodCategory);
             }
             else{
-                 items = await FoodModel.prototype.getAllFoods()
+                 items = await foodModel.getAllFoods()
             }
             res.status(StatusCodes.OK).json(items)
         }
