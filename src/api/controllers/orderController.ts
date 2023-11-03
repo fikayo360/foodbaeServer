@@ -1,72 +1,59 @@
 import OrderModel from '../../models/orderModel';
 import { Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
-import Usermodel from '../../models/userModel';
-
+import tryCatch from '../../utils/tryCatch';
 const orderModel = new OrderModel();
 
 class Order {
-    async createOrder(req:Request,res:Response){
-        const username = req.user.username
-        const {products,amount,address} = req.body
-        if(products.length === 0 ){
-            return res.status(StatusCodes.BAD_REQUEST).json('products cant be empty');
+     createOrder = tryCatch(
+       async (req:Request,res:Response) =>{
+            const username = req.user.username
+            const {products,amount,address} = req.body
+            if(products.length === 0 ){
+                return res.status(StatusCodes.BAD_REQUEST).json('products cant be empty');
+            }
+            if(!amount || !address){
+                return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty');
+            }
+          
+                const neworder = await orderModel.createOrder(username,products,amount,address)
+                console.log(neworder)
+                res.status(StatusCodes.OK).json(neworder)
         }
-        if(!amount || !address){
-            return res.status(StatusCodes.BAD_REQUEST).json('fields cant be empty');
-        }
-        try{
-            const neworder = await orderModel.createOrder(username,products,amount,address)
-            console.log(neworder)
-            res.status(StatusCodes.OK).json(neworder)
-        }
-        catch(err){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err)
-        }
-    }
+     )
 
-    async deleteOrderById(req: Request, res: Response){
-        const {id} = req.params
-        try{
-            const deleted = await orderModel.deleteOrder(id)
-            res.status(StatusCodes.OK).json("order deleted")
+    deleteOrderById = tryCatch(
+        async(req: Request, res: Response) => {
+            const {id} = req.params
+          
+                const deleted = await orderModel.deleteOrder(id)
+                res.status(StatusCodes.OK).json("order deleted")
         }
-        catch(err){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
-        }
-    }
+    )
 
-    async updateOrderStatus(req: Request, res: Response){
-        const {id} = req.params
-        try{
-            const updated = await orderModel.updateOrderStatus(id)
-            res.status(StatusCodes.OK).json("order updated")
-        }catch(err){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
+    updateOrderStatus = tryCatch(
+        async(req: Request, res: Response) =>{
+            const {id} = req.params
+                const updated = await orderModel.updateOrderStatus(id)
+                res.status(StatusCodes.OK).json("order updated")
         }
-    }
+    )
 
-    async getOrderById(req: Request, res: Response){
-        const {userId} = req.params
-        try{
-            const searchFood = await orderModel.getOrdersById(userId)
-            res.status(StatusCodes.OK).json(searchFood)
-        }catch(err){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
+     getOrderById = tryCatch(
+        async (req: Request, res: Response) => {
+            const {userId} = req.params
+                const searchFood = await orderModel.getOrdersById(userId)
+                res.status(StatusCodes.OK).json(searchFood)
         }
-    }
+     )
 
-    async allOrders(req: Request, res: Response){
-       
-        try{
+     allOrders = tryCatch(
+        async (req: Request, res: Response) =>{
             let items = await orderModel.getAllOrders()
             res.status(StatusCodes.OK).json(items)
-        }
-        catch(err){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json("error occured")
-        }
     }
+     )
 
 }
 
-export default Order
+export default new Order()

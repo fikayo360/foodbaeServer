@@ -5,31 +5,35 @@ dotenv.config();
 import axios from 'axios';
 const cors = require('cors');
 import { StatusCodes } from 'http-status-codes';
-const cookieParser = require('cookie-parser');
-import { authUser } from './api/middlewares/auth';
-app.use(cors());
-app.use(express.json());
-
+const ErrorHandler = require('./api/middlewares/error-handler')
 const userRoute = require('./api/routes/userRoutes')
 const orderRoute = require('./api/routes/orderRoutes')
 const foodRoute = require('./api/routes/foodRoutes')
+const rateLimiter = require('express-rate-limit')
+
 // rest of the packages
 //const morgan = require('morgan');
 
-//const rateLimiter = require('express-rate-limit');
 //const helmet = require('helmet');
-
 
 // app.use(notFoundMiddleware);
 // app.use(errorHandlerMiddleware);
 // app.use(cookieParser(process.env.JWT_SECRET));
+
+const appLimiter = rateLimiter({
+  windowMs:1000,
+  max:100
+})
+
+app.use(appLimiter())
+app.use(cors());
+app.use(express.json());
+app.use(ErrorHandler())
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/order',orderRoute)
 app.use('/api/v1/food',foodRoute)
-// app.use('/api/v1/savedPost', savedPostRoute);
-// app.use('/api/v1/post', postRoute);
-// app.use('/api/v1/notification', notificationRoute);
-// app.use('/api/v1/news', newsRoute);
+
+
 
 app.get('/api/v1/server-location', async (req, res) => {
   try {
